@@ -73,12 +73,12 @@ export default function EnglishReviewPage() {
 
     return (
         <div className="flex flex-col h-screen bg-gradient-to-b from-purple-400 to-pink-500 p-8">
-            <h1 className="text-4xl font-bold text-white text-center mb-8">Fun English Review ! 🎉</h1>
+            <h1 className="text-4xl font-bold text-white text-center mb-8">Fun Vocabulary Review ! 🎉</h1>
             <div className="flex flex-1 justify-center items-center">
                 {dataDict && !isFinished && <WordPair dataDict={dataDict} setIsFinished={setIsFinished} setCorrectWord={handleCorrectWordUpdate} correctWord={correctWord}/>}
                 {dataDict && isFinished && <ScoreComponent setCorrectWord={setCorrectWord} totalWords={totalWords} correctWord={correctWord} onRestart={() => setIsFinished(false)}/>}
                 {!dataDict &&
-                    <Card className="mb-8 w-8/12">
+                    <Card className="mb-8 sm:w-11/12 md:w-8/12">
                         <CardHeader>
                             <CardTitle className="text-2xl font-bold">Download your csv file ! </CardTitle>
                             <CardDescription>Get your personalized English review sheet ! Try to learn your vocabulary !</CardDescription>
