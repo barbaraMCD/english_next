@@ -69,7 +69,7 @@ export default function WordPair({dataDict, setCorrectWord, correctWord, setIsFi
                             {index !== 0 && displayResponse && (
                                 <Input
                                     id={`input-correct-answer`}
-                                    value={goodWord ? "Correct !" : `Faux. La bonne réponse est : ${dataDict[languages[1]][currentIndex].toLowerCase()}`}
+                                    value={goodWord ? "Correct !" : `Faux. Bonne réponse : ${dataDict[languages[1]][currentIndex].toLowerCase()}`}
                                     className={goodWord ? "mt-1 bg-green-500 text-white" :  "mt-1 bg-red-500 text-white"}
                                     readOnly={true}
                                 />
