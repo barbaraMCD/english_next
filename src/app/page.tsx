@@ -1,101 +1,103 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import WordPair, {DataDictInterface} from "@/components/WordPair/WordPair";
+import {ChangeEvent, useEffect, useRef, useState} from "react";
+import ScoreComponent from "@/components/ScoreComponent/ScoreComponent";
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+export default function EnglishReviewPage() {
+    const fileInputRef = useRef(null);
+    const [dataDict, setDataDict] = useState< DataDictInterface | null>(null);
+    const [correctWord, setCorrectWord] = useState(0);
+    const [totalWords, setTotalWords] = useState(0);
+    const [isFinished, setIsFinished] = useState(false);
+
+    const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
+        const file = event?.target?.files?.[0];
+        if (file && file.name.endsWith(".csv")) {
+            const reader = new FileReader();
+
+            reader.onload = () => {
+                const csvContent = reader.result;
+
+                if (typeof csvContent === "string") {
+                    const lines = csvContent.split("\n");
+                    const cleanedLines = lines.map((line) => line.replace(/\r/g, '').trim());
+
+                    const headers = cleanedLines[0].split(",");
+
+                    if (headers.length !== 2) {
+                        console.log("Ajouter un toaster")
+                    }
+
+                    const dataDict: { [key: string]: string[] } = {};
+
+                    headers.forEach((header) => {
+                        dataDict[header] = [];
+                    });
+
+                    lines.slice(1).forEach((line) => {
+                        const values = line.split(",");
+                        headers.forEach((header, index) => {
+                            if (dataDict[header]) {
+                                dataDict[header].push(values[index]?.trim());
+                            }
+                        });
+                    });
+
+                    setDataDict(dataDict);
+                    console.log("Data Dictionary:", dataDict);
+                }
+            };
+
+            reader.onerror = (error) => {
+                console.error("Erreur de lecture du fichier : ", error);
+            };
+
+            reader.readAsText(file);
+        } else {
+            alert("Veuillez sélectionner un fichier .csv !");
+        }
+    };
+
+    const handleCorrectWordUpdate = (newCorrectWord: number) => {
+        setCorrectWord(newCorrectWord);
+    };
+
+    useEffect(() => {
+        if (dataDict) {
+            setTotalWords(dataDict[Object.keys(dataDict)[0]].length);
+        }
+    }, [dataDict]);
+
+    return (
+        <div className="flex flex-col h-screen bg-gradient-to-b from-purple-400 to-pink-500 p-8">
+            <h1 className="text-4xl font-bold text-white text-center mb-8">Fun English Review ! 🎉</h1>
+            <div className="flex flex-1 justify-center items-center">
+                {dataDict && !isFinished && <WordPair dataDict={dataDict} setIsFinished={setIsFinished} setCorrectWord={handleCorrectWordUpdate} correctWord={correctWord}/>}
+                {dataDict && isFinished && <ScoreComponent setCorrectWord={setCorrectWord} totalWords={totalWords} correctWord={correctWord} onRestart={() => setIsFinished(false)}/>}
+                {!dataDict &&
+                    <Card className="mb-8 w-8/12">
+                        <CardHeader>
+                            <CardTitle className="text-2xl font-bold">Download your csv file ! </CardTitle>
+                            <CardDescription>Get your personalized English review sheet ! Try to learn your vocabulary !</CardDescription>
+                            <CardDescription> Create sheet file with 2 columns at the start of the document (column A and B), with headers and words inside</CardDescription>
+                            <CardDescription> Save your sheet to .csv format</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid w-full max-w-sm items-center gap-1.5">
+                                <Input
+                                    ref={fileInputRef}
+                                    id="englishFile"
+                                    accept=".csv"
+                                    type="file"
+                                    onChange={handleFileSelect}
+                                />
+                            </div>
+                        </CardContent>
+                    </Card>}
+            </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+    );
 }
