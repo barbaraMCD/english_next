@@ -47,7 +47,7 @@ export default function EnglishReviewPage() {
                     });
 
                     setDataDict(dataDict);
-                    console.log("Data Dictionary:", dataDict);
+                    console.log("Dictionnaire de données :", dataDict);
                 }
             };
 
@@ -73,17 +73,17 @@ export default function EnglishReviewPage() {
 
     return (
         <div className="flex flex-col h-screen bg-gradient-to-b from-purple-400 to-pink-500 p-8">
-            <h1 className="text-4xl font-bold text-white text-center mb-8">Fun Vocabulary Review ! 🎉</h1>
+            <h1 className="text-4xl font-bold text-white text-center mb-8">Révision de vocabulaire amusante 🎉</h1>
             <div className="flex flex-1 justify-center items-center">
                 {dataDict && !isFinished && <WordPair dataDict={dataDict} setIsFinished={setIsFinished} setCorrectWord={handleCorrectWordUpdate} correctWord={correctWord}/>}
                 {dataDict && isFinished && <ScoreComponent setCorrectWord={setCorrectWord} totalWords={totalWords} correctWord={correctWord} onRestart={() => setIsFinished(false)}/>}
                 {!dataDict &&
                     <Card className="mb-8 sm:w-11/12 md:w-8/12">
                         <CardHeader>
-                            <CardTitle className="text-2xl font-bold">Download your csv file ! </CardTitle>
-                            <CardDescription>Get your personalized English review sheet ! Try to learn your vocabulary !</CardDescription>
-                            <CardDescription> Create sheet file with 2 columns at the start of the document (column A and B), with headers and words inside</CardDescription>
-                            <CardDescription> Save your sheet to .csv format</CardDescription>
+                            <CardTitle className="text-2xl font-bold">Téléchargez votre fichier csv ! </CardTitle>
+                            <CardDescription>Créez votre feuille de révision personnalisée en anglais ! Apprenez votre vocabulaire !</CardDescription>
+                            <CardDescription>Créez une feuille avec 2 colonnes au début du document (colonnes A et B), en ligne 1, avec des en-têtes et des mots dans les colonnes</CardDescription>
+                            <CardDescription>Enregistrez votre feuille au format .csv</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="grid w-full max-w-sm items-center gap-1.5">
